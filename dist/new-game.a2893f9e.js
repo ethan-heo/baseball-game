@@ -156,8 +156,6 @@ var Component = /*#__PURE__*/function () {
   }, {
     key: "dispatch",
     value: function dispatch(name, value) {
-      var _this = this;
-
       if (!this.actions[name]) {
         return;
       }
@@ -165,8 +163,7 @@ var Component = /*#__PURE__*/function () {
       var self = this;
       this.actions[name].forEach(function (callback) {
         callback(self, value);
-
-        _this.render(_this.state);
+        self.render(self.state);
       });
     }
   }]);

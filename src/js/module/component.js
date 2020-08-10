@@ -23,7 +23,7 @@ class Component {
 
     this.actions[name].forEach((callback) => {
       callback(self, value);
-      this.render(this.state);
+      self.render(self.state);
     });
   }
 }
