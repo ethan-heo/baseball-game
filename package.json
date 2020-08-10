@@ -6,6 +6,7 @@
   "devDependencies": {
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
+    "@types/jest": "^26.0.9",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.2.2",
     "eslint": "^7.6.0",
@@ -16,7 +17,7 @@
     "parcel-bundler": "^1.12.4"
   },
   "scripts": {
-    "dev": "parvel ./src/index.html --watch",
+    "dev": "parcel ./src/index.html",
     "test": "jest"
   }
 }
