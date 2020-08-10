@@ -22,12 +22,16 @@ function main() {
   container.addEventListener('click', (e) => {
     const target = e.target;
 
-    if (target.closest('.btn-link.minus')) {
+    if (target.closest('#minus-btn')) {
       counter.dispatch('decrease', 1);
     }
 
-    if (target.closest('.btn-link.plus')) {
+    if (target.closest('#plus-btn')) {
       counter.dispatch('increase', 1);
+    }
+
+    if (target.closest('#start-btn')) {
+      target.closest('#start-btn').href = `./game.html?digit=${counter.state}`;
     }
   });
 }

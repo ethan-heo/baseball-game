@@ -2,6 +2,10 @@ class Component {
   constructor({ state }) {
     this.state = state;
     this.actions = {};
+
+    Object.defineProperty(this, 'state', {
+      enumerable: false,
+    });
   }
 
   render() {}

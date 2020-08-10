@@ -139,6 +139,9 @@ var Component = /*#__PURE__*/function () {
 
     this.state = state;
     this.actions = {};
+    Object.defineProperty(this, 'state', {
+      enumerable: false
+    });
   }
 
   _createClass(Component, [{
@@ -273,12 +276,16 @@ function main() {
   container.addEventListener('click', function (e) {
     var target = e.target;
 
-    if (target.closest('.btn-link.minus')) {
+    if (target.closest('#minus-btn')) {
       counter.dispatch('decrease', 1);
     }
 
-    if (target.closest('.btn-link.plus')) {
+    if (target.closest('#plus-btn')) {
       counter.dispatch('increase', 1);
+    }
+
+    if (target.closest('#start-btn')) {
+      target.closest('#start-btn').href = "./game.html?digit=".concat(counter.state);
     }
   });
 }
