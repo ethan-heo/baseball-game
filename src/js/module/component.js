@@ -16,6 +16,7 @@ class Component {
     }
 
     this.actions[name].push(callback);
+    return this;
   }
 
   dispatch(name, value) {
@@ -29,6 +30,7 @@ class Component {
       callback(self, value);
       self.render(self.state);
     });
+    return this;
   }
 }
 

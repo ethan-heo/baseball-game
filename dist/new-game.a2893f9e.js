@@ -155,6 +155,7 @@ var Component = /*#__PURE__*/function () {
       }
 
       this.actions[name].push(callback);
+      return this;
     }
   }, {
     key: "dispatch",
@@ -168,6 +169,7 @@ var Component = /*#__PURE__*/function () {
         callback(self, value);
         self.render(self.state);
       });
+      return this;
     }
   }]);
 
@@ -268,11 +270,9 @@ function main() {
   });
   counter.addAction('increase', function (context, value) {
     context.state += value;
-  });
-  counter.addAction('decrease', function (context, value) {
+  }).addAction('decrease', function (context, value) {
     context.state -= context.state === 0 ? 0 : value;
-  });
-  counter.render(0);
+  }).render(0);
   container.addEventListener('click', function (e) {
     var target = e.target;
 

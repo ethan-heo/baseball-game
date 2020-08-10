@@ -10,14 +10,14 @@ function main() {
 
   const counter = new Counter({ el: container.querySelector('#digit-number'), state: 0 });
 
-  counter.addAction('increase', (context, value) => {
-    context.state += value;
-  });
-  counter.addAction('decrease', (context, value) => {
-    context.state -= context.state === 0 ? 0 : value;
-  });
-
-  counter.render(0);
+  counter
+    .addAction('increase', (context, value) => {
+      context.state += value;
+    })
+    .addAction('decrease', (context, value) => {
+      context.state -= context.state === 0 ? 0 : value;
+    })
+    .render(0);
 
   container.addEventListener('click', (e) => {
     const target = e.target;
