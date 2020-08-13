@@ -2,6 +2,7 @@ import GuessInput from './components/GuessInput';
 import Baseball from './components/Baseball';
 import App from './components/App';
 import { getRandomInt } from './utils';
+import { storage } from './module/storage';
 
 function main() {
   const params = new URLSearchParams(location.search);
@@ -10,7 +11,6 @@ function main() {
 
   baseball
     .addAction('init', (context, value) => {
-      // { problem: '', results: [] }
       context.state = value;
     })
     .addAction('makeProblem', (context, value) => {
@@ -31,7 +31,12 @@ function main() {
       }, []);
     })
     .addAction('result', (context, value) => {
-      context.state.guesses.push(value);
+      const state = context.state;
+      state.guesses.push(value);
+      storage.save(state.id, state);
+    })
+    .addAction('done', () => {
+      app.done();
     });
 
   guessInput
@@ -64,12 +69,14 @@ function main() {
     });
 
   const app = new App({
+    id: params.get('id'),
+    digitNumber: Number(params.get('digit')),
+    saveFile: storage.load(params.get('id')),
     guessInput,
     baseball,
   });
 
-  console.log(baseball);
-  app.start({ digitNumber: Number(params.get('digit')), saveFile: null });
+  app.start();
 }
 
 window.addEventListener('DOMContentLoaded', main);

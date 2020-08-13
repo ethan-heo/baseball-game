@@ -19,7 +19,7 @@ class Component {
     return this;
   }
 
-  dispatch(name, value) {
+  dispatch(name, value, isRender = true) {
     if (!this.actions[name]) {
       return;
     }
@@ -28,7 +28,7 @@ class Component {
 
     this.actions[name].forEach((callback) => {
       callback(self, value);
-      self.render(self.state);
+      isRender && self.render(self.state);
     });
     return this;
   }

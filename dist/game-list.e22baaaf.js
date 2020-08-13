@@ -180,13 +180,13 @@ var Component = /*#__PURE__*/function () {
 
 var _default = Component;
 exports.default = _default;
-},{}],"js/components/Counter.js":[function(require,module,exports) {
+},{}],"js/components/GameList.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.GameList = void 0;
 
 var _component = _interopRequireDefault(require("../module/component"));
 
@@ -214,18 +214,25 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var Counter = /*#__PURE__*/function (_Component) {
-  _inherits(Counter, _Component);
+function getGameListTemplate(_ref) {
+  var id = _ref.id,
+      digitNumber = _ref.digitNumber,
+      status = _ref.status;
+  return "\n    <div class=\"col-sm-4 col-md-3\">\n        <div class=\"thumbnail\">\n        <div id=\"".concat(id, "\" class=\"caption\">\n            <h3>").concat(digitNumber, "\uC790\uB9AC \uAC8C\uC784</h3>\n            <p>id: ").concat(id, "</p>\n            <p>\n            <a href=\"game.html?id=").concat(id, "&digit=").concat(digitNumber, "\" class=\"btn btn-primary btn-continue-game ").concat(status === 'done' && 'disabled', "\">\uC774\uC5B4\uD558\uAE30</a>\n            <a href=\"#\" class=\"btn btn-danger btn-delete-game\" data-id=\"").concat(id, "\">\uC0AD\uC81C\uD558\uAE30</a>\n            </p>\n        </div>\n        </div>\n    </div>\n    ");
+}
 
-  var _super = _createSuper(Counter);
+var GameList = /*#__PURE__*/function (_Component) {
+  _inherits(GameList, _Component);
 
-  function Counter(_ref) {
+  var _super = _createSuper(GameList);
+
+  function GameList(_ref2) {
     var _this;
 
-    var el = _ref.el,
-        state = _ref.state;
+    var el = _ref2.el,
+        state = _ref2.state;
 
-    _classCallCheck(this, Counter);
+    _classCallCheck(this, GameList);
 
     _this = _super.call(this, {
       state: state
@@ -234,18 +241,19 @@ var Counter = /*#__PURE__*/function (_Component) {
     return _this;
   }
 
-  _createClass(Counter, [{
+  _createClass(GameList, [{
     key: "render",
     value: function render(state) {
-      this.el.innerText = state;
+      this.el.innerHTML = state.map(function (game) {
+        return getGameListTemplate(game);
+      }).join('');
     }
   }]);
 
-  return Counter;
+  return GameList;
 }(_component.default);
 
-var _default = Counter;
-exports.default = _default;
+exports.GameList = GameList;
 },{"../module/component":"js/module/component.js"}],"js/module/storage.js":[function(require,module,exports) {
 "use strict";
 
@@ -285,45 +293,40 @@ var storage = {
   }
 };
 exports.storage = storage;
-},{}],"js/new-game.js":[function(require,module,exports) {
+},{}],"js/game-list.js":[function(require,module,exports) {
 "use strict";
 
-var _Counter = _interopRequireDefault(require("./components/Counter"));
+var _GameList = require("./components/GameList");
 
 var _storage = require("./module/storage");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function main() {
-  var container = document.querySelector('.container.digit-selector');
-  var counter = new _Counter.default({
-    el: container.querySelector('#digit-number'),
-    state: 0
+  var gameList = new _GameList.GameList({
+    el: document.querySelector('.row'),
+    state: []
   });
-  counter.addAction('increase', function (context, value) {
-    context.state += value;
-  }).addAction('decrease', function (context, value) {
-    context.state -= context.state === 0 ? 0 : value;
-  }).render(0);
-  container.addEventListener('click', function (e) {
-    var target = e.target;
+  gameList.addAction('init', function (context, value) {
+    context.state = value;
+    context.el.addEventListener('click', function (e) {
+      var target = e.target;
 
-    if (target.closest('#minus-btn')) {
-      counter.dispatch('decrease', 1);
-    }
+      if (target.closest('.btn-delete-game')) {
+        var id = target.dataset.id;
+        context.dispatch('remove', id);
+      }
+    });
+  }).addAction('remove', function (context, id) {
+    context.state = context.state.filter(function (game) {
+      return game.id !== id;
+    });
 
-    if (target.closest('#plus-btn')) {
-      counter.dispatch('increase', 1);
-    }
-
-    if (target.closest('#start-btn')) {
-      target.closest('#start-btn').href = "./game.html?id=".concat(_storage.storage.getNextGameId(), "&digit=").concat(counter.state);
-    }
+    _storage.storage.delete(id);
   });
+  gameList.dispatch('init', Object.values(_storage.storage.getAll()));
 }
 
 window.addEventListener('DOMContentLoaded', main);
-},{"./components/Counter":"js/components/Counter.js","./module/storage":"js/module/storage.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./components/GameList":"js/components/GameList.js","./module/storage":"js/module/storage.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -527,5 +530,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/new-game.js"], null)
-//# sourceMappingURL=/new-game.a2893f9e.js.map
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/game-list.js"], null)
+//# sourceMappingURL=/game-list.e22baaaf.js.map

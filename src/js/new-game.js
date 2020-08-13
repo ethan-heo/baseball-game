@@ -1,13 +1,8 @@
 import Counter from './components/Counter';
+import { storage } from './module/storage';
 
 function main() {
   const container = document.querySelector('.container.digit-selector');
-
-  if (!container) {
-    console.error(`Not found container`);
-    return;
-  }
-
   const counter = new Counter({ el: container.querySelector('#digit-number'), state: 0 });
 
   counter
@@ -31,7 +26,7 @@ function main() {
     }
 
     if (target.closest('#start-btn')) {
-      target.closest('#start-btn').href = `./game.html?digit=${counter.state}`;
+      target.closest('#start-btn').href = `./game.html?id=${storage.getNextGameId()}&digit=${counter.state}`;
     }
   });
 }

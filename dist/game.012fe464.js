@@ -160,6 +160,8 @@ var Component = /*#__PURE__*/function () {
   }, {
     key: "dispatch",
     value: function dispatch(name, value) {
+      var isRender = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
       if (!this.actions[name]) {
         return;
       }
@@ -167,7 +169,7 @@ var Component = /*#__PURE__*/function () {
       var self = this;
       this.actions[name].forEach(function (callback) {
         callback(self, value);
-        self.render(self.state);
+        isRender && self.render(self.state);
       });
       return this;
     }
@@ -316,7 +318,7 @@ var Baseball = /*#__PURE__*/function (_Component) {
         if (strike === digitNumber) {
           result = "".concat(strike, "S");
 
-          _this2.done();
+          _this2.dispatch('done', null, false);
         } else if (ball === digitNumber) {
           result = "".concat(ball, "B");
         } else {
@@ -324,15 +326,12 @@ var Baseball = /*#__PURE__*/function (_Component) {
         }
 
         return resultTemplate(guess, result);
-      });
+      }).join('');
     }
   }, {
-    key: "done",
-    value: function done() {
-      var guessInputEl = document.querySelector('#guess');
-      guessInputEl.type = 'text';
-      guessInputEl.value = '정답을 맞추었습니다.';
-      guessInputEl.disabled = true;
+    key: "getState",
+    value: function getState() {
+      return this.state;
     }
   }]);
 
@@ -341,13 +340,54 @@ var Baseball = /*#__PURE__*/function (_Component) {
 
 var _default = Baseball;
 exports.default = _default;
-},{"../module/component":"js/module/component.js"}],"js/components/App.js":[function(require,module,exports) {
+},{"../module/component":"js/module/component.js"}],"js/module/storage.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.storage = void 0;
+var localStorage = window.localStorage;
+var storage = {
+  save: function save(id, gameInfo) {
+    var games = JSON.parse(localStorage.getItem('games')) || {};
+    games[id] = gameInfo;
+    localStorage.removeItem('games');
+    localStorage.setItem('games', JSON.stringify(games));
+  },
+  load: function load(id) {
+    var games = JSON.parse(localStorage.getItem('games')) || {};
+    return games[id];
+  },
+  done: function done(id) {
+    var games = JSON.parse(localStorage.getItem('games')) || {};
+    localStorage.removeItem('games');
+    games[id].status = 'done';
+    localStorage.setItem('games', JSON.stringify(games));
+  },
+  delete: function _delete(id) {
+    var games = JSON.parse(localStorage.getItem('games')) || {};
+    localStorage.removeItem('games');
+    delete games[id];
+    localStorage.setItem('games', JSON.stringify(games));
+  },
+  getAll: function getAll() {
+    return JSON.parse(localStorage.getItem('games')) || {};
+  },
+  getNextGameId: function getNextGameId() {
+    return Object.keys(JSON.parse(localStorage.getItem('games')) || {}).length + 1;
+  }
+};
+exports.storage = storage;
+},{}],"js/components/App.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+
+var _storage = require("../module/storage");
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -363,31 +403,61 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var App = /*#__PURE__*/function () {
   function App(_ref) {
-    var guessInput = _ref.guessInput,
+    var id = _ref.id,
+        digitNumber = _ref.digitNumber,
+        saveFile = _ref.saveFile,
+        guessInput = _ref.guessInput,
         baseball = _ref.baseball;
 
     _classCallCheck(this, App);
 
+    this.id = id;
+    this.digitNumber = digitNumber;
+    this.saveFile = saveFile;
     this.guessInput = guessInput;
     this.baseball = baseball;
   }
 
   _createClass(App, [{
     key: "start",
-    value: function start(_ref2) {
-      var digitNumber = _ref2.digitNumber,
-          saveFile = _ref2.saveFile;
+    value: function start() {
+      var id = this.id,
+          digitNumber = this.digitNumber,
+          saveFile = this.saveFile;
       this.guessInput.dispatch('init', digitNumber);
-      this.baseball.dispatch('init', _objectSpread(_objectSpread({}, saveFile || {
-        problem: '',
-        guesses: []
-      }), {}, {
-        digitNumber: digitNumber
-      }));
 
-      if (!saveFile) {
+      if (saveFile) {
+        this.baseball.dispatch('init', _objectSpread(_objectSpread({}, saveFile), {}, {
+          digitNumber: digitNumber
+        }));
+      } else {
+        this.baseball.dispatch('init', _objectSpread(_objectSpread({}, {
+          id: id,
+          problem: [],
+          guesses: [],
+          status: 'doing'
+        }), {}, {
+          digitNumber: digitNumber
+        }));
         this.baseball.dispatch('makeProblem', digitNumber);
+
+        _storage.storage.save(id, this.baseball.getState());
       }
+
+      if (saveFile.status === 'done') {
+        this.done();
+        return;
+      }
+    }
+  }, {
+    key: "done",
+    value: function done() {
+      var guessInput = this.guessInput;
+      guessInput.el.type = 'text';
+      guessInput.el.value = '정답을 맞추었습니다.';
+      guessInput.el.disabled = true;
+
+      _storage.storage.done(this.id);
     }
   }]);
 
@@ -395,7 +465,7 @@ var App = /*#__PURE__*/function () {
 }();
 
 exports.default = App;
-},{}],"js/utils/index.js":[function(require,module,exports) {
+},{"../module/storage":"js/module/storage.js"}],"js/utils/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -417,6 +487,8 @@ var _App = _interopRequireDefault(require("./components/App"));
 
 var _utils = require("./utils");
 
+var _storage = require("./module/storage");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function main() {
@@ -428,7 +500,6 @@ function main() {
     el: document.querySelector('#guess')
   });
   baseball.addAction('init', function (context, value) {
-    // { problem: '', results: [] }
     context.state = value;
   }).addAction('makeProblem', function (context, value) {
     context.state.problem = new Array(value).fill(0).reduce(function (result) {
@@ -448,7 +519,12 @@ function main() {
       return result;
     }, []);
   }).addAction('result', function (context, value) {
-    context.state.guesses.push(value);
+    var state = context.state;
+    state.guesses.push(value);
+
+    _storage.storage.save(state.id, state);
+  }).addAction('done', function () {
+    app.done();
   });
   guessInput.addAction('init', function (context, value) {
     context.state.digitNumber = value;
@@ -477,18 +553,17 @@ function main() {
     alert(error.message);
   });
   var app = new _App.default({
+    id: params.get('id'),
+    digitNumber: Number(params.get('digit')),
+    saveFile: _storage.storage.load(params.get('id')),
     guessInput: guessInput,
     baseball: baseball
   });
-  console.log(baseball);
-  app.start({
-    digitNumber: Number(params.get('digit')),
-    saveFile: null
-  });
+  app.start();
 }
 
 window.addEventListener('DOMContentLoaded', main);
-},{"./components/GuessInput":"js/components/GuessInput.js","./components/Baseball":"js/components/Baseball.js","./components/App":"js/components/App.js","./utils":"js/utils/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./components/GuessInput":"js/components/GuessInput.js","./components/Baseball":"js/components/Baseball.js","./components/App":"js/components/App.js","./utils":"js/utils/index.js","./module/storage":"js/module/storage.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
