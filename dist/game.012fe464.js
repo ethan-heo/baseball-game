@@ -178,7 +178,63 @@ var Component = /*#__PURE__*/function () {
 
 var _default = Component;
 exports.default = _default;
-},{}],"js/components/Counter.js":[function(require,module,exports) {
+},{}],"js/components/GuessInput.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _component = _interopRequireDefault(require("../module/component"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var GuessInput = /*#__PURE__*/function (_Component) {
+  _inherits(GuessInput, _Component);
+
+  var _super = _createSuper(GuessInput);
+
+  function GuessInput(_ref) {
+    var _this;
+
+    var el = _ref.el,
+        _ref$state = _ref.state,
+        state = _ref$state === void 0 ? {} : _ref$state;
+
+    _classCallCheck(this, GuessInput);
+
+    _this = _super.call(this, {
+      state: state
+    });
+    _this.el = el;
+    return _this;
+  }
+
+  return GuessInput;
+}(_component.default);
+
+var _default = GuessInput;
+exports.default = _default;
+},{"../module/component":"js/module/component.js"}],"js/components/Baseball.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -212,18 +268,23 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var Counter = /*#__PURE__*/function (_Component) {
-  _inherits(Counter, _Component);
+function resultTemplate(guess, result) {
+  return "\n        <li class=\"list-group-item\">\n            <span class=\"guess\">".concat(guess, "</span>\n            <span class=\"badge result\">").concat(result, "</span>\n        </li>\n    ");
+}
 
-  var _super = _createSuper(Counter);
+var Baseball = /*#__PURE__*/function (_Component) {
+  _inherits(Baseball, _Component);
 
-  function Counter(_ref) {
+  var _super = _createSuper(Baseball);
+
+  function Baseball(_ref) {
     var _this;
 
     var el = _ref.el,
-        state = _ref.state;
+        _ref$state = _ref.state,
+        state = _ref$state === void 0 ? {} : _ref$state;
 
-    _classCallCheck(this, Counter);
+    _classCallCheck(this, Baseball);
 
     _this = _super.call(this, {
       state: state
@@ -232,61 +293,202 @@ var Counter = /*#__PURE__*/function (_Component) {
     return _this;
   }
 
-  _createClass(Counter, [{
+  _createClass(Baseball, [{
     key: "render",
     value: function render(state) {
-      this.el.innerText = state;
+      var _this2 = this;
+
+      var guesses = state.guesses,
+          problem = state.problem,
+          digitNumber = state.digitNumber;
+      this.el.innerHTML = guesses.map(function (guess) {
+        var strike = 0;
+        var ball = 0;
+        guess.split('').forEach(function (guessNumber, idx) {
+          if (Number(guessNumber) === problem[idx]) {
+            strike += 1;
+          } else {
+            ball += 1;
+          }
+        });
+        var result = 'OUT';
+
+        if (strike === digitNumber) {
+          result = "".concat(strike, "S");
+
+          _this2.done();
+        } else if (ball === digitNumber) {
+          result = "".concat(ball, "B");
+        } else {
+          result = "".concat(strike, "S").concat(ball, "B");
+        }
+
+        return resultTemplate(guess, result);
+      });
+    }
+  }, {
+    key: "done",
+    value: function done() {
+      var guessInputEl = document.querySelector('#guess');
+      guessInputEl.type = 'text';
+      guessInputEl.value = '정답을 맞추었습니다.';
+      guessInputEl.disabled = true;
     }
   }]);
 
-  return Counter;
+  return Baseball;
 }(_component.default);
 
-var _default = Counter;
+var _default = Baseball;
 exports.default = _default;
-},{"../module/component":"js/module/component.js"}],"js/new-game.js":[function(require,module,exports) {
+},{"../module/component":"js/module/component.js"}],"js/components/App.js":[function(require,module,exports) {
 "use strict";
 
-var _Counter = _interopRequireDefault(require("./components/Counter"));
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var App = /*#__PURE__*/function () {
+  function App(_ref) {
+    var guessInput = _ref.guessInput,
+        baseball = _ref.baseball;
+
+    _classCallCheck(this, App);
+
+    this.guessInput = guessInput;
+    this.baseball = baseball;
+  }
+
+  _createClass(App, [{
+    key: "start",
+    value: function start(_ref2) {
+      var digitNumber = _ref2.digitNumber,
+          saveFile = _ref2.saveFile;
+      this.guessInput.dispatch('init', digitNumber);
+      this.baseball.dispatch('init', _objectSpread(_objectSpread({}, saveFile || {
+        problem: '',
+        guesses: []
+      }), {}, {
+        digitNumber: digitNumber
+      }));
+
+      if (!saveFile) {
+        this.baseball.dispatch('makeProblem', digitNumber);
+      }
+    }
+  }]);
+
+  return App;
+}();
+
+exports.default = App;
+},{}],"js/utils/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getRandomInt = getRandomInt;
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+},{}],"js/game.js":[function(require,module,exports) {
+"use strict";
+
+var _GuessInput = _interopRequireDefault(require("./components/GuessInput"));
+
+var _Baseball = _interopRequireDefault(require("./components/Baseball"));
+
+var _App = _interopRequireDefault(require("./components/App"));
+
+var _utils = require("./utils");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function main() {
-  var container = document.querySelector('.container.digit-selector');
-
-  if (!container) {
-    console.error("Not found container");
-    return;
-  }
-
-  var counter = new _Counter.default({
-    el: container.querySelector('#digit-number'),
-    state: 0
+  var params = new URLSearchParams(location.search);
+  var baseball = new _Baseball.default({
+    el: document.querySelector('.result-container')
   });
-  counter.addAction('increase', function (context, value) {
-    context.state += value;
-  }).addAction('decrease', function (context, value) {
-    context.state -= context.state === 0 ? 0 : value;
-  }).render(0);
-  container.addEventListener('click', function (e) {
-    var target = e.target;
+  var guessInput = new _GuessInput.default({
+    el: document.querySelector('#guess')
+  });
+  baseball.addAction('init', function (context, value) {
+    // { problem: '', results: [] }
+    context.state = value;
+  }).addAction('makeProblem', function (context, value) {
+    context.state.problem = new Array(value).fill(0).reduce(function (result) {
+      var randomNumber;
 
-    if (target.closest('#minus-btn')) {
-      counter.dispatch('decrease', 1);
-    }
+      while (true) {
+        randomNumber = (0, _utils.getRandomInt)(0, value);
 
-    if (target.closest('#plus-btn')) {
-      counter.dispatch('increase', 1);
-    }
+        if (!result.some(function (r) {
+          return r === randomNumber;
+        })) {
+          break;
+        }
+      }
 
-    if (target.closest('#start-btn')) {
-      target.closest('#start-btn').href = "./game.html?digit=".concat(counter.state);
-    }
+      result.push(randomNumber);
+      return result;
+    }, []);
+  }).addAction('result', function (context, value) {
+    context.state.guesses.push(value);
+  });
+  guessInput.addAction('init', function (context, value) {
+    context.state.digitNumber = value;
+    context.el.addEventListener('keydown', function (e) {
+      if (e.keyCode === 13) {
+        try {
+          var values = Array.from(e.target.value).map(function (v) {
+            return Number(v);
+          });
+
+          if (values.length !== context.state.digitNumber) {
+            throw new Error('자릿수가 맞지 않습니다.');
+          }
+
+          context.dispatch('guess', e.target.value).dispatch('clear');
+        } catch (e) {
+          context.dispatch('error', e);
+        }
+      }
+    });
+  }).addAction('clear', function (context) {
+    context.el.value = '';
+  }).addAction('guess', function (_, value) {
+    baseball.dispatch('result', value);
+  }).addAction('error', function (_, error) {
+    alert(error.message);
+  });
+  var app = new _App.default({
+    guessInput: guessInput,
+    baseball: baseball
+  });
+  console.log(baseball);
+  app.start({
+    digitNumber: Number(params.get('digit')),
+    saveFile: null
   });
 }
 
 window.addEventListener('DOMContentLoaded', main);
-},{"./components/Counter":"js/components/Counter.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./components/GuessInput":"js/components/GuessInput.js","./components/Baseball":"js/components/Baseball.js","./components/App":"js/components/App.js","./utils":"js/utils/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -490,5 +692,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/new-game.js"], null)
-//# sourceMappingURL=/new-game.a2893f9e.js.map
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/game.js"], null)
+//# sourceMappingURL=/game.012fe464.js.map

@@ -4,10 +4,6 @@ class Counter extends Component {
   constructor({ el, state }) {
     super({ state });
 
-    if (!el) {
-      throw Error('el가 없습니다.');
-    }
-
     this.el = el;
   }
 
